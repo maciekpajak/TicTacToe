@@ -1,0 +1,17 @@
+Version v0.0
+- README.md
++ README
++ Board.h
++ Board.cpp
++ main.h
+
+Version v1.0
+		
++ TicTacToe/Move.h
++ TicTacToe/TicTacToe.cpp
++ TicTacToe/TicTacToe.h
+
+modified:   
+	TicTacToe/main.cpp
+	TicTacToe/Board.cpp
+	TicTacToe/Board.h
