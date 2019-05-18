@@ -1,0 +1,26 @@
+Pojekt PAMSI
+
+Projekt nr 3 - Gry
+Do oddania w tygodniu 3-7.06.2019
+
+Gra wybrana do napisania to:
+	Kółko i Krzyżyk
+
+Wybrana gra może zostać oceniona na ocenę 5 + 0,5 za wersję graficzną
+
+Opis gry Kółko i Krzyżyk:
+	Gra dla 2 graczy.
+	Graczom przedzielone zostają indentyfikatory(dalej nazywane znakami):
+		o - kółko lub
+		x - krzyżyk.
+		
+	Na początku gry definiuje się:
+		n - rozmiar kwadratowej planszy (liczba pól na planszy to n*n)
+		r - liczba znaków w rzędzie potrzebna do wygrania gry.
+		Warunki:
+			n > 0 
+			0 < r <= n 
+	
+	Gracze wykonują na zmianę ruchy polegające na umieszczeniu swojego znaku
+	na dowolnym niezajętym polu na planszy. Wygrywa gracz, który jako pierwszy
+	po swoim ruchu będzie miał r swoich znaków w rzędzie (pionowo, poziomo lub skośnie).
