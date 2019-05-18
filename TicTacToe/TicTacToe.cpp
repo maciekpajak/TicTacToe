@@ -2,27 +2,78 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <string>
 
+#include "Exeptions.h"
 
-move TicTacToe::game()
+bool TicTacToe::isWin()
+{
+	for (int i = 0; i < board_->getSize(); i++)
+	{
+		if (isRInRow(i)) return true;
+		if (isRInColumn(i)) return true;
+	}
+	return false;
+}
+
+move TicTacToe::play()
 {
 	srand((unsigned int)time(NULL));
-	return move::firstPlayer;
+	int i = rand() % 2;
+	i == 0 ? move_ = move::firstPlayer : move_ = move::secondPlayer;
+	std::cout << "Zaczyna gracz: " << (int)move_ << std::endl;
+	board_->display();
+	while (!isWin())
+	{
+		if (board_->isFull()) throw FULL_BOARD_EXEPTION;
+		std::cout << "Tura gracza: " << (int)move_ << std::endl;
+		playerMove();
+		changeTurn();
+		board_->display();
+	}
+	changeTurn();
+	return move_;
+}
+
+bool TicTacToe::isRInRow(unsigned int y)
+{
+	if (y < 0 or y >= board_->getSize())
+		throw INVALID_INDEX_EXEPTION;
+	std::string row(r_, ' ');
+	std::string rowX(r_, 'X');
+	std::string rowO(r_, 'O');
+	for (int i = 0; i < board_->getSize(); i++)
+	{
+		row[i % r_] = (*board_)(i, y);
+		if (row.compare(rowX) == 0 or row.compare(rowO) == 0) return true;
+	}
+	return false;
+}
+
+bool TicTacToe::isRInColumn(unsigned int x)
+{
+	if (x < 0 or x>(board_->getSize() - 1))
+		throw INVALID_INDEX_EXEPTION;
+	std::string row(r_, ' ');
+	std::string rowX(r_, 'X');
+	std::string rowO(r_, 'O');
+	for (int i = 0; i < board_->getSize(); i++)
+	{
+		row[i % r_] = (*board_)(x, i);
+		if (row.compare(rowX) == 0 or row.compare(rowO) == 0) return true;
+	}
+	return false;
+}
+
+void TicTacToe::changeTurn()
+{
+	move_ == firstPlayer ? move_ = secondPlayer : move_ = firstPlayer;
 }
 
 void TicTacToe::playerMove()
 {
-
-	if (move_ == firstPlayer)
-		firstPlayerMove();
-	if (move_ == secondPlayer)
-		secondPlayerMove();
-}
-
-void TicTacToe::firstPlayerMove()
-{
 	unsigned int x, y;
-	std::cout << "Podaj wspolrzedne O (x,y): ";
+	std::cout << "Podaj wspolrzedne (x,y): ";
 	bool isExeption;
 	do
 	{
@@ -32,7 +83,7 @@ void TicTacToe::firstPlayerMove()
 		isExeption = false;
 		try
 		{
-			board_.markO(x, y);
+			move_ == firstPlayer ? board_->markO(x, y) : board_->markX(x, y);
 		}
 		catch (int exeption)
 		{
@@ -62,10 +113,11 @@ void TicTacToe::firstPlayerMove()
 
 TicTacToe::TicTacToe(unsigned int size, unsigned int row)
 {
-	board_ = Board(size);
+	if (row<0 or row>size)
+		throw INVALID_MARKS_IN_ROW_EXEPTION;
+	board_ = new Board(size);
 	r_ = row;
 }
-
 
 TicTacToe::~TicTacToe()
 {

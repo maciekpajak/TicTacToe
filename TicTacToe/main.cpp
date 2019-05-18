@@ -2,62 +2,45 @@
 #include <Windows.h>
 
 #include "Board.h"
+#include "TicTacToe.h"
+#include "Exeptions.h"
 
 int main()
 {
-	int n;
-	std::cout << "Podaj rozmiar planszy: ";
-	std::cin >> n;
-	std::cin.clear();
-	std::cin.ignore(1000, '\n');
-
-	Board B = Board(n);
-
-	int x, y;
-	for (int i = 0; i < n*n; i++)
-	{
-		std::cout << "Podaj wspolrzedne O (x,y): ";
-		bool isExeption;
-		do
+	unsigned int n,r;
+	TicTacToe* game = new TicTacToe();
+	bool isExeption;
+	std::cout << "Podaj rozmiar planszy (n) oraz liczbe znakow w rzedzie potrzebna do wygranej (r): ";
+	do {
+		std::cin >> n >> r;
+		isExeption = false;
+		try { game = new TicTacToe(n, r); }
+		catch(int exeption)
 		{
-			std::cin >> x >> y;
-			std::cin.clear();
-			std::cin.ignore(1000, '\n');
-			isExeption = false;
-			try
+			if (exeption == INVALID_MARKS_IN_ROW_EXEPTION)
 			{
-				B.markO(x, y);
-			}
-			catch (int exeption)
-			{
-				switch (exeption)
-				{
-				case INVALID_INDEX_EXEPTION:
-					{
-					std::cout << "Nieprawidlowe wpolrzedne. Podaj jeszcze raz: ";
-					std::cin.clear();
-					break;
-					}
-				case FULL_BOARD_EXEPTION:
-					{
-					std::cout << "Plansza zapelniona. KONIEC.";
-					system("PAUSE");
-					return 1;
-					}
-				case FIELD_OCCUPIED_EXEPTION:
-					{
-					std::cout << "Pole zajete, wybierz inne pole. Podaj wspolrzedne: ";
-					std::cin.clear();
-					break;
-					}
-				default: break;
-				}
+				std::cout << "Niepoprawna liczba znakow w rzedzie. Podaj jeszcze raz: ";
 				isExeption = true;
 			}
-		} while (isExeption);
-		B.display();
+			if (exeption == INVALID_SIZE_EXEPTION)
+			{
+				std::cout << "Niepoprawny rozmiar. Podaj jeszcze raz: ";
+				isExeption = true;
+			}
+		}
+	} while (isExeption);
+	move winner;
+	try { winner = game->play(); }
+	catch (int exeption)
+	{
+		if (exeption == FULL_BOARD_EXEPTION)
+		{
+			std::cout << "Plansza zapelniona. REMIS" << std::endl;
+			system("PAUSE");
+			return 1;
+		}
 	}
-
+	std::cout << "Wygrywa gracz: " << (int)winner << std::endl;
 	system("PAUSE");
 	return 1;
 }

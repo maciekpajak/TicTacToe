@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+#include "Exeptions.h"
+
 Board::Board()
 {
 	size_ = 3;
@@ -68,7 +70,7 @@ bool Board::isFull()
 
 void Board::markO(int x, int y)
 {
-	if (x < 0 or x>(size_ - 1) or y < 0 or y>(size_ - 1))
+	if (x < 0 or x > (size_ - 1) or y < 0 or y > (size_ - 1))
 		throw INVALID_INDEX_EXEPTION;
 
 	if (isFull())

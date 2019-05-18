@@ -2,6 +2,6 @@
 
 enum move
 {
-	firstPlayer,
-	secondPlayer
+	firstPlayer = 1,
+	secondPlayer = 2
 };

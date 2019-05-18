@@ -5,7 +5,7 @@
 class TicTacToe
 {
 private:
-	Board board_;
+	Board* board_;
 	unsigned int r_;
 	move move_;
 
@@ -13,11 +13,16 @@ public:
 
 	bool isWin();
 
-	move game();
-	void playerMove();
-	void firstPlayerMove();
-	void secondPlayerMove();
+	move play();
 
+	bool isRInRow(unsigned int y);
+	bool isRInColumn(unsigned int x);
+	bool isRInDiagonal() { return false; }
+
+	void changeTurn();
+	void playerMove();
+
+	TicTacToe() {};
 	TicTacToe(unsigned int size, unsigned int row);
 	~TicTacToe();
 };

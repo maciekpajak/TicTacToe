@@ -7,11 +7,16 @@ Version v0.0
 
 Version v1.0
 		
-+ TicTacToe/Move.h
-+ TicTacToe/TicTacToe.cpp
-+ TicTacToe/TicTacToe.h
++ Move.h
++ TicTacToe.cpp
++ TicTacToe.h
 
-modified:   
-	TicTacToe/main.cpp
-	TicTacToe/Board.cpp
-	TicTacToe/Board.h
+	
+Version v1.1
++ change_log.txt
+
+Version v2.0
++ Exeptions.h 
+
+Description:
+  Player vs. Player -> r in row wins (except diagonal)

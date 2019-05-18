@@ -1,9 +1,6 @@
 #pragma once
 
-#define INVALID_INDEX_EXEPTION 2
-#define FIELD_OCCUPIED_EXEPTION 3
-#define FULL_BOARD_EXEPTION 4
-#define INVALID_SIZE_EXEPTION 5
+
 
 class Board
 {
