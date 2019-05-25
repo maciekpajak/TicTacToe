@@ -20,3 +20,16 @@ Version v2.0
 
 Description:
   Player vs. Player -> r in row wins (except diagonal)
+  
+Version v3.0
++ Player.h
++ Computer.h
++ Computer.cpp
+- Move.h
+
+Changes:
++ r in row in diagonals added
++ r im row moved to class Board
++ minmax algorithm add in class Computer added
++ game player vs. computer added
++ cleaning screen update

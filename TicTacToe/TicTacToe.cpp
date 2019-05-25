@@ -8,70 +8,56 @@
 
 bool TicTacToe::isWin()
 {
-	for (int i = 0; i < board_->getSize(); i++)
-	{
-		if (isRInRow(i)) return true;
-		if (isRInColumn(i)) return true;
-	}
-	return false;
+	if (board_->isRinRow(r_)) 
+		return true;
+	else
+		return false;
 }
 
-move TicTacToe::play()
+player TicTacToe::play()
+{
+	player_ = randStartPlayer();
+
+	std::cout << "Zaczyna symbol: " << (char)player_ << std::endl;
+
+	board_->display();
+
+	while (true)
+	{
+		if (board_->isFull()) 
+			throw FULL_BOARD_EXEPTION;
+		std::cout << "Tura gracza: " << (char)player_ << std::endl;
+		move(player_);
+		system("CLS");
+		board_->display();
+		if (isWin()) break;
+		changeTurn();
+	}
+	return player_;
+}
+
+player TicTacToe::randStartPlayer()
 {
 	srand((unsigned int)time(NULL));
-	int i = rand() % 2;
-	i == 0 ? move_ = move::firstPlayer : move_ = move::secondPlayer;
-	std::cout << "Zaczyna gracz: " << (int)move_ << std::endl;
-	board_->display();
-	while (!isWin())
-	{
-		if (board_->isFull()) throw FULL_BOARD_EXEPTION;
-		std::cout << "Tura gracza: " << (int)move_ << std::endl;
-		playerMove();
-		changeTurn();
-		board_->display();
-	}
-	changeTurn();
-	return move_;
-}
-
-bool TicTacToe::isRInRow(unsigned int y)
-{
-	if (y < 0 or y >= board_->getSize())
-		throw INVALID_INDEX_EXEPTION;
-	std::string row(r_, ' ');
-	std::string rowX(r_, 'X');
-	std::string rowO(r_, 'O');
-	for (int i = 0; i < board_->getSize(); i++)
-	{
-		row[i % r_] = (*board_)(i, y);
-		if (row.compare(rowX) == 0 or row.compare(rowO) == 0) return true;
-	}
-	return false;
-}
-
-bool TicTacToe::isRInColumn(unsigned int x)
-{
-	if (x < 0 or x>(board_->getSize() - 1))
-		throw INVALID_INDEX_EXEPTION;
-	std::string row(r_, ' ');
-	std::string rowX(r_, 'X');
-	std::string rowO(r_, 'O');
-	for (int i = 0; i < board_->getSize(); i++)
-	{
-		row[i % r_] = (*board_)(x, i);
-		if (row.compare(rowX) == 0 or row.compare(rowO) == 0) return true;
-	}
-	return false;
+	int i = rand() % 2 + 1;
+	if (i == 1)
+		return player::X;
+	else
+		return player::O;
 }
 
 void TicTacToe::changeTurn()
 {
-	move_ == firstPlayer ? move_ = secondPlayer : move_ = firstPlayer;
+	player_ == player::X ? player_ = player::O : player_ = player::X;
 }
 
-void TicTacToe::playerMove()
+void TicTacToe::move(player p)
 {
+	if (player_ == player::X)
+	{
+		computerMove();
+		return;
+	}
 	unsigned int x, y;
 	std::cout << "Podaj wspolrzedne (x,y): ";
 	bool isExeption;
@@ -83,7 +69,7 @@ void TicTacToe::playerMove()
 		isExeption = false;
 		try
 		{
-			move_ == firstPlayer ? board_->markO(x, y) : board_->markX(x, y);
+			board_->markO(x, y);
 		}
 		catch (int exeption)
 		{
@@ -109,6 +95,18 @@ void TicTacToe::playerMove()
 			isExeption = true;
 		}
 	} while (isExeption);
+}
+
+void TicTacToe::computerMove()
+{
+	Board currentBoard = Board(*board_);
+	Computer* com = new Computer(currentBoard, r_, player::X, player::O);
+	unsigned int* optimalXY;
+	optimalXY = com->optimalMove();
+	//board_->display();
+	board_->markX(optimalXY[0], optimalXY[1]);
+	//board_->display();
+	delete com;
 }
 
 TicTacToe::TicTacToe(unsigned int size, unsigned int row)

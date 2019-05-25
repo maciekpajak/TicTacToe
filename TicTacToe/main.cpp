@@ -29,7 +29,8 @@ int main()
 			}
 		}
 	} while (isExeption);
-	move winner;
+	player winner = player::X;
+	//winner = game->play();
 	try { winner = game->play(); }
 	catch (int exeption)
 	{
@@ -40,7 +41,7 @@ int main()
 			return 1;
 		}
 	}
-	std::cout << "Wygrywa gracz: " << (int)winner << std::endl;
+	std::cout << "Wygrywa gracz: " << (char)winner << std::endl;
 	system("PAUSE");
 	return 1;
 }

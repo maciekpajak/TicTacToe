@@ -10,18 +10,28 @@ private:
 public:
 
 	Board();
-	Board(unsigned int n);
+	Board(unsigned int size);
+	Board(const Board &copyBoard);
 	~Board();
 
 	void display();
 
 	bool isFull();
 
-	void markO(int x, int y);
-	void markX(int x, int y);
+	void markO(unsigned int x,unsigned int y);
+	void markX(unsigned int x,unsigned int y);
+
+	bool isFieldEmpty(unsigned int x, unsigned int y);
+	bool isFieldOccupied(unsigned int x, unsigned int y);
+
+	bool isRinRowHorizontal(unsigned int r, unsigned int y);
+	bool isRinRowVertical(unsigned int r, unsigned int x);
+	bool isRinRowDiagonally(unsigned int r);
+
+	bool isRinRow(unsigned int r);
 
 	unsigned int getSize() { return size_; }
 
-	char operator()(int x, int y);
+	char operator()(unsigned int x,unsigned int y);
 };
 
