@@ -44,6 +44,13 @@ Board::Board(const Board &copyBoard)
 
 Board::~Board()
 {
+	/*
+	for (unsigned int i = 0; i < size_; i++)
+	{
+		delete board_[i];
+	}
+	delete board_;
+	*/
 }
 
 void Board::display()
@@ -77,6 +84,11 @@ bool Board::isFull()
 			if (isFieldEmpty(x,y))
 				return false;
 	return true;
+}
+
+void Board::mark(player p, unsigned int x, unsigned int y)
+{
+	p == player::X ? markX(x, y) : markO(x, y);
 }
 
 void Board::markO(unsigned int x, unsigned int y)

@@ -3,61 +3,158 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
-
 #include "Exeptions.h"
 
 bool TicTacToe::isWin()
 {
-	if (board_->isRinRow(r_)) 
-		return true;
-	else
-		return false;
+	return board_->isRinRow(r_) ? true : false; 
 }
 
-player TicTacToe::play()
+void TicTacToe::init()
 {
-	player_ = randStartPlayer();
-
-	std::cout << "Zaczyna symbol: " << (char)player_ << std::endl;
-
+	randStartPlayer();
+	std::cout << "Zaczyna symbol: " << (char)currentPlayer_ << std::endl;
 	board_->display();
+}
 
-	while (true)
+void TicTacToe::play()
+{
+	init();
+
+	while (!board_->isFull())
 	{
-		if (board_->isFull()) 
-			throw FULL_BOARD_EXEPTION;
-		std::cout << "Tura gracza: " << (char)player_ << std::endl;
-		move(player_);
+		std::cout << "Tura gracza: " << (char)currentPlayer_ << std::endl;
+		move(currentPlayer_);
 		system("CLS");
 		board_->display();
-		if (isWin()) break;
+		if (isWin())
+		{
+			winner_ = currentPlayer_;
+			isDraw_ = false;
+			break;
+		}
 		changeTurn();
 	}
-	return player_;
 }
 
-player TicTacToe::randStartPlayer()
+void TicTacToe::randStartPlayer()
 {
 	srand((unsigned int)time(NULL));
 	int i = rand() % 2 + 1;
 	if (i == 1)
-		return player::X;
+		currentPlayer_ = player::X;
 	else
-		return player::O;
+		currentPlayer_ = player::O;
+}
+
+void TicTacToe::randSymbols()
+{
+	srand((unsigned int)time(NULL));
+	int i = rand() % 2 + 1;
+	if (i == 1)
+	{
+		player_ = player::X;
+		computer_ = player::O;
+	}
+	else
+	{
+		player_ = player::O;
+		computer_ = player::X;
+	}
 }
 
 void TicTacToe::changeTurn()
 {
-	player_ == player::X ? player_ = player::O : player_ = player::X;
+	currentPlayer_ == computer_ ? currentPlayer_ = player_ : currentPlayer_ = computer_;
 }
 
 void TicTacToe::move(player p)
 {
-	if (player_ == player::X)
+	p == computer_ ? computerMove() : playerMove();
+}
+
+int TicTacToe::minmax_computer(Board board, unsigned int depthLevel, int alpha, int beta)
+{
+	if (board.isRinRow(r_)) return -1;
+	if (board.isFull()) return 0;
+	
+	for (unsigned int x = 0; x < board.getSize(); x++)
 	{
-		computerMove();
-		return;
+		for (unsigned int y = 0; y < board.getSize(); y++)
+		{
+			if (board.isFieldOccupied(x, y))
+				continue;
+
+			Board newBoard = Board(board);
+			newBoard.mark(computer_, x, y);
+
+			alpha = std::max(alpha, minmax_player(newBoard, depthLevel + 1, alpha, beta));
+			if (alpha == 1) return alpha;
+			if (alpha >= beta) return beta;
+		}
 	}
+
+	return alpha;
+
+}
+
+int TicTacToe::minmax_player(Board board, unsigned int depthLevel, int alpha, int beta)
+{
+	if (board.isRinRow(r_)) return 1;
+	if (board.isFull()) return 0;
+
+	for (unsigned int x = 0; x < board.getSize(); x++)
+	{
+		for (unsigned int y = 0; y < board.getSize(); y++)
+		{
+			if (board.isFieldOccupied(x, y))
+				continue;
+
+			Board newBoard = Board(board);
+			newBoard.mark(player_, x, y);
+
+			beta = std::min(beta, minmax_computer(newBoard, depthLevel + 1, alpha, beta));
+			if (beta == -1) return beta;
+			if (alpha >= beta) return alpha;
+
+		}
+	}
+	return beta;
+}
+
+void TicTacToe::computerMove()
+{
+	Board currentBoard = Board(*board_);
+	unsigned int optimalXY[2] = { 0,0 };
+	int maximum = -1;
+	for (unsigned int x = 0; x < currentBoard.getSize(); x++)
+	{
+		for (unsigned int y = 0; y < currentBoard.getSize(); y++)
+		{
+			Board newBoard = Board(currentBoard);
+			if (currentBoard.isFieldOccupied(x, y))
+				continue;
+			newBoard.mark(computer_, x, y);
+
+			int tmp = minmax_player(newBoard, 1, -1, 1);
+			if (tmp >= maximum)
+			{
+				optimalXY[0] = x;
+				optimalXY[1] = y;
+				maximum = tmp;
+			}
+			if (maximum == 1) 
+			{ 
+				board_->mark(computer_, optimalXY[0], optimalXY[1]);
+				return; 
+			}
+		}
+	}
+	board_->mark(computer_,optimalXY[0], optimalXY[1]);
+}
+
+void TicTacToe::playerMove()
+{
 	unsigned int x, y;
 	std::cout << "Podaj wspolrzedne (x,y): ";
 	bool isExeption;
@@ -69,7 +166,7 @@ void TicTacToe::move(player p)
 		isExeption = false;
 		try
 		{
-			board_->markO(x, y);
+			board_->mark(player_, x, y);
 		}
 		catch (int exeption)
 		{
@@ -97,18 +194,6 @@ void TicTacToe::move(player p)
 	} while (isExeption);
 }
 
-void TicTacToe::computerMove()
-{
-	Board currentBoard = Board(*board_);
-	Computer* com = new Computer(currentBoard, r_, player::X, player::O);
-	unsigned int* optimalXY;
-	optimalXY = com->optimalMove();
-	//board_->display();
-	board_->markX(optimalXY[0], optimalXY[1]);
-	//board_->display();
-	delete com;
-}
-
 TicTacToe::TicTacToe(unsigned int size, unsigned int row)
 {
 	if (row<0 or row>size)
@@ -120,3 +205,4 @@ TicTacToe::TicTacToe(unsigned int size, unsigned int row)
 TicTacToe::~TicTacToe()
 {
 }
+

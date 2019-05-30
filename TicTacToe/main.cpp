@@ -1,9 +1,13 @@
+
+//#define NOMINMAX
 #include <iostream>
 #include <Windows.h>
 
 #include "Board.h"
 #include "TicTacToe.h"
 #include "Exeptions.h"
+//#include <SFML\Graphics.hpp>
+
 
 int main()
 {
@@ -29,19 +33,21 @@ int main()
 			}
 		}
 	} while (isExeption);
-	player winner = player::X;
-	//winner = game->play();
-	try { winner = game->play(); }
-	catch (int exeption)
+
+	try 
 	{
-		if (exeption == FULL_BOARD_EXEPTION)
-		{
-			std::cout << "Plansza zapelniona. REMIS" << std::endl;
-			system("PAUSE");
-			return 1;
-		}
+		game->play();
 	}
-	std::cout << "Wygrywa gracz: " << (char)winner << std::endl;
+	catch(...)
+	{
+		system("PAUSE");
+	}
+
+	if (game->isDraw())
+		std::cout << "REMIS.Koniec gry." << std::endl;
+	else
+		std::cout << "Wygrywa gracz: " << (char)game->getWinner() << std::endl;
+
 	system("PAUSE");
 	return 1;
 }

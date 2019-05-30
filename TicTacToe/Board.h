@@ -1,12 +1,19 @@
 #pragma once
-
-
+#include "Player.h"
 
 class Board
 {
 private:
 	unsigned int size_;
 	char **board_;
+
+private:
+	void markO(unsigned int x,unsigned int y);
+	void markX(unsigned int x,unsigned int y);
+	
+	bool isRinRowHorizontal(unsigned int r, unsigned int y);
+	bool isRinRowVertical(unsigned int r, unsigned int x);
+	bool isRinRowDiagonally(unsigned int r);
 public:
 
 	Board();
@@ -16,17 +23,12 @@ public:
 
 	void display();
 
-	bool isFull();
+	inline bool isFull();
 
-	void markO(unsigned int x,unsigned int y);
-	void markX(unsigned int x,unsigned int y);
+	void mark(player p, unsigned int x, unsigned int y);
 
 	bool isFieldEmpty(unsigned int x, unsigned int y);
 	bool isFieldOccupied(unsigned int x, unsigned int y);
-
-	bool isRinRowHorizontal(unsigned int r, unsigned int y);
-	bool isRinRowVertical(unsigned int r, unsigned int x);
-	bool isRinRowDiagonally(unsigned int r);
 
 	bool isRinRow(unsigned int r);
 
