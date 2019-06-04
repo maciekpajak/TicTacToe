@@ -1,20 +1,22 @@
 
-//#define NOMINMAX
+#define NOMINMAX
 #include <iostream>
 #include <Windows.h>
-
+#include <time.h>
 #include "Board.h"
 #include "TicTacToe.h"
 #include "Exeptions.h"
-//#include <SFML\Graphics.hpp>
+#include <SFML\Graphics.hpp>
 
 
 int main()
 {
+
 	unsigned int n,r;
-	TicTacToe* game = new TicTacToe();
+	
 	bool isExeption;
 	std::cout << "Podaj rozmiar planszy (n) oraz liczbe znakow w rzedzie potrzebna do wygranej (r): ";
+	TicTacToe* game = new TicTacToe();
 	do {
 		std::cin >> n >> r;
 		isExeption = false;
@@ -34,6 +36,8 @@ int main()
 		}
 	} while (isExeption);
 
+
+
 	try 
 	{
 		game->play();
@@ -42,12 +46,6 @@ int main()
 	{
 		system("PAUSE");
 	}
-
-	if (game->isDraw())
-		std::cout << "REMIS.Koniec gry." << std::endl;
-	else
-		std::cout << "Wygrywa gracz: " << (char)game->getWinner() << std::endl;
-
 	system("PAUSE");
 	return 1;
 }

@@ -33,3 +33,19 @@ Changes:
 + minmax algorithm add in class Computer added
 + game player vs. computer added
 + cleaning screen update
+
+Version v4.0
+- Computer.h
+- Computer.cpp
+
+Changes:
++ implemented alpha-beta algorythm
++ minmax algorythm moved to class TicTacToe
++ some functions divided into smaller ones for better readability
+
+Version v5.0
++ Graphics/
+
+Changes:
++ GUI
++ better heuristic function
