@@ -7,7 +7,6 @@
 #include "Exeptions.h"
 
 
-
 class Board
 {
 private:

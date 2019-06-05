@@ -20,117 +20,165 @@ void TicTacToe::init(sf::RenderWindow &screen)
 	std::cout << "Zaczyna symbol: " << (char)currentPlayer_ << std::endl;
 	board_->display();
 
-	sf::Texture tekstura;
-	tekstura.loadFromFile("Graphics/field.png");
+	sf::Texture texture;
+	texture.loadFromFile("Graphics/field.png");
 	sf::Sprite field_sprite;
-	field_sprite.setTexture(tekstura);
+	field_sprite.setTexture(texture);
+
+	sf::Texture texture1;
+	texture1.loadFromFile("Graphics/menu.png");
+	sf::Sprite menu_sprite;
+	menu_sprite.setTexture(texture1);
+	menu_sprite.setPosition(SCREEN_X / 2.f, SCREEN_Y);
 
 	double scale_x = (double)SCREEN_X / size_ / FIELD_SIZE;
 	double scale_y = (double)SCREEN_Y / size_ / FIELD_SIZE;
 
-	field_sprite.scale(scale_x, scale_y);
+	field_sprite.scale((float)scale_x, (float)scale_y);
+
 	screen.clear(sf::Color::Black);
-	for (int x = 0; x < size_; x++)
-		for (int y = 0; y < size_; y++)
+	for (unsigned int x = 0; x < size_; x++)
+		for (unsigned int y = 0; y < size_; y++)
 		{
-			field_sprite.setPosition(x*SCREEN_X / size_, y*SCREEN_Y / size_);
+			field_sprite.setPosition((float)x*SCREEN_X / size_, (float)y*SCREEN_Y / size_);
 			screen.draw(field_sprite);
 		}
+	screen.draw(menu_sprite);
 	screen.display();
 }
 
 void TicTacToe::play()
 {
 	
-	sf::RenderWindow screen(sf::VideoMode(SCREEN_X, SCREEN_Y, 32), "TIC TAC TOE",sf::Style::Titlebar);
-	sf::Vector2i pozycjaMyszyWzgledemOkna;
+	sf::RenderWindow screen(sf::VideoMode(SCREEN_X, SCREEN_Y + MENU_BAR, 32), "TIC TAC TOE",sf::Style::Titlebar);
+	sf::Vector2i mousePosition;
+
+	sf::Texture texture1;
+	texture1.loadFromFile("Graphics/menu.png");
+	sf::Sprite menu_sprite;
+	menu_sprite.setTexture(texture1);
+	menu_sprite.setPosition(SCREEN_X / 2.f, SCREEN_Y);
+
+	sf::Texture texture2;
+	texture2.loadFromFile("Graphics/draw.png");
+	sf::Sprite draw_sprite;
+	draw_sprite.setTexture(texture2);
+	draw_sprite.setPosition(0, SCREEN_Y);
+
+	sf::Texture texture3;
+	texture3.loadFromFile("Graphics/winnerO.png");
+	sf::Sprite winnerO_sprite;
+	winnerO_sprite.setTexture(texture3);
+	winnerO_sprite.setPosition(0, SCREEN_Y);
+
+	sf::Texture texture4;
+	texture4.loadFromFile("Graphics/winnerX.png");
+	sf::Sprite winnerX_sprite;
+	winnerX_sprite.setTexture(texture4);
+	winnerX_sprite.setPosition(0, SCREEN_Y);
+
+	sf::Texture texture5;
+	texture5.loadFromFile("Graphics/playerMove.png");
+	sf::Sprite player_sprite;
+	player_sprite.setTexture(texture5);
+	player_sprite.setPosition(0, SCREEN_Y);
+
+	sf::Texture texture6;
+	texture6.loadFromFile("Graphics/computerMove.png");
+	sf::Sprite com_sprite;
+	com_sprite.setTexture(texture6);
+	com_sprite.setPosition(0, SCREEN_Y);
 
 	init(screen);
+
 	bool canMove = true;
+	bool end = false;
+
+	
 	while (screen.isOpen())
 	{
-		sf::Event zdarzenie;
-		while (screen.pollEvent(zdarzenie))
+		sf::Event event;
+		while (screen.pollEvent(event))
 		{
-			if (zdarzenie.type == sf::Event::Closed)
+
+			if (currentPlayer_ == player_ and !end)
+				screen.draw(player_sprite);
+			screen.display();
+
+			if (event.type == sf::Event::Closed)
 				screen.close();
 
-			if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape)
+			if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::Escape)
 				screen.close();
 
-			if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::R)
+			if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::R)
 			{
 				reset();
 				init(screen);
 				canMove = true;
+				end = false;
 			}
 			
 			if (currentPlayer_ == computer_ and canMove)
 			{
+				screen.draw(com_sprite);
+				screen.display();
 				graphicComputerMove(screen);
 				board_->display();
 				if (board_->isFull() and !isWin())
 				{
-					sf::Texture tekstura;
-					tekstura.loadFromFile("Graphics/draw.png");
-					sf::Sprite winner_sprite;
-					winner_sprite.setTexture(tekstura);
-					screen.draw(winner_sprite);
+					screen.draw(draw_sprite);
 					canMove = false;
+					end = true;
 				}
 				if (isWin())
 				{
 					winner_ = currentPlayer_;
-					isDraw_ = false;
-					sf::Texture tekstura;
 					if (winner_ == player::O)
-						tekstura.loadFromFile("Graphics/winnerO.png");
+						screen.draw(winnerO_sprite);
 					else
-						tekstura.loadFromFile("Graphics/winnerX.png");
-					sf::Sprite winner_sprite;
-					winner_sprite.setTexture(tekstura);
-					screen.draw(winner_sprite);
+						screen.draw(winnerX_sprite);
 					canMove = false;
+					end = true;
 				}
 
 				changeTurn();
+				
 			}
 
-			if (zdarzenie.type == sf::Event::MouseButtonPressed and zdarzenie.mouseButton.button == sf::Mouse::Left)
+			if (event.type == sf::Event::MouseButtonPressed and event.mouseButton.button == sf::Mouse::Left)
 			{
-				pozycjaMyszyWzgledemOkna = sf::Mouse::getPosition(screen);
-				if(currentPlayer_ == player_ and canMove)
-				if (graphicPlayerMove(pozycjaMyszyWzgledemOkna, screen))
+				mousePosition = sf::Mouse::getPosition(screen);
+				if (mousePosition.y < SCREEN_Y)
 				{
-					//system("CLS");
-					board_->display();
-					if (board_->isFull() and !isWin())
+					if (currentPlayer_ == player_ and canMove)
 					{
-						sf::Texture tekstura;
-						tekstura.loadFromFile("Graphics/draw.png");
-						sf::Sprite winner_sprite;
-						winner_sprite.setTexture(tekstura);
-						screen.draw(winner_sprite);
-						canMove = false;
+						if (graphicPlayerMove(mousePosition, screen))
+						{
+							system("CLS");
+							board_->display();
+							if (board_->isFull() and !isWin())
+							{
+								screen.draw(draw_sprite);
+								canMove = false;
+								end = true;
+							}
+							if (isWin())
+							{
+								winner_ = currentPlayer_;
+								if (winner_ == player::O)
+									screen.draw(winnerO_sprite);
+								else
+									screen.draw(winnerX_sprite);
+								canMove = false;
+								end = true;
+							}
+							changeTurn();
+						}
 					}
-					if (isWin())
-					{
-						winner_ = currentPlayer_;
-						isDraw_ = false;
-						sf::Texture tekstura;
-						if (winner_ == player::O)
-							tekstura.loadFromFile("Graphics/winnerO.png");
-						else
-							tekstura.loadFromFile("Graphics/winnerX.png");
-						sf::Sprite winner_sprite;
-						winner_sprite.setTexture(tekstura);
-						screen.draw(winner_sprite);
-						canMove = false;
-					}
-					changeTurn();
 				}
 			}
-
+			
 			screen.display();
 		}
 	}
@@ -139,37 +187,12 @@ void TicTacToe::play()
 void TicTacToe::reset()
 {
 	board_->clean();
-	isDraw_ = true;
 	howManyEmpty_ = board_->getSize()*board_->getSize();
 }
 
-
-/*
-void TicTacToe::play()
-{
-	init();
-	while(!board.isFull())
-	{
-		std::cout << "Tura gracza: " << (char)currentPlayer_ << std::endl;
-		move(currentPlayer_, screen);
-		//system("CLS");
-		board_->display();
-		if (isWin())
-		{
-			winner_ = currentPlayer_;
-			isDraw_ = false;
-			break;
-		}
-		changeTurn();
-	}
-
-}
-*/
-
-
 void TicTacToe::randStartPlayer()
 {
-	srand((unsigned int)time(NULL));
+	//srand((unsigned int)time(NULL));
 	int i = rand() % 2;
 	if (i == 1)
 		currentPlayer_ = player::X;
@@ -347,11 +370,11 @@ void TicTacToe::playerMove()
 	} while (isExeption);
 }
 
-bool TicTacToe::graphicPlayerMove(sf::Vector2i polozenieMyszkiWzgledemOkna, sf::RenderWindow & screen)
+bool TicTacToe::graphicPlayerMove(sf::Vector2i mousePosition, sf::RenderWindow & screen)
 {
 
-	unsigned int x = (unsigned int)std::floor(size_*polozenieMyszkiWzgledemOkna.x / SCREEN_X);
-	unsigned int y = (unsigned int)std::floor(size_*polozenieMyszkiWzgledemOkna.y / SCREEN_Y);
+	unsigned int x = (unsigned int)std::floor(size_*mousePosition.x / SCREEN_X);
+	unsigned int y = (unsigned int)std::floor(size_*mousePosition.y / SCREEN_Y);
 
 	if (board_->isFieldOccupied(x, y)) return false;
 
@@ -363,8 +386,8 @@ bool TicTacToe::graphicPlayerMove(sf::Vector2i polozenieMyszkiWzgledemOkna, sf::
 	sf::Sprite sprite;
 	sprite.setTexture(texture);
 
-	float scale_x = (float)(SCREEN_X / (float)size_ / SYMBOL_SIZE)-0.5f;
-	float scale_y = (float)(SCREEN_Y / (float)size_ / SYMBOL_SIZE)-0.5f;
+	float scale_x = (float)(SCREEN_X / (float)size_ / SYMBOL_SIZE)-0.3f;
+	float scale_y = (float)(SCREEN_Y / (float)size_ / SYMBOL_SIZE)-0.3f;
 
 	float symbol_x = scale_x * SYMBOL_SIZE;
 	float symbol_y = scale_y * SYMBOL_SIZE;
@@ -382,10 +405,10 @@ bool TicTacToe::graphicPlayerMove(sf::Vector2i polozenieMyszkiWzgledemOkna, sf::
 	scale_x = (float)SCREEN_X / size_ / FIELD_SIZE;
 	scale_y = (float)SCREEN_Y / size_ / FIELD_SIZE;
 
-	float symbol_pos_x = FIELD_SIZE * scale_x * (x + 0.5);
-	float symbol_pos_y = FIELD_SIZE * scale_y * (y + 0.5);
+	double symbol_pos_x = FIELD_SIZE * scale_x * (x + 0.5);
+	double symbol_pos_y = FIELD_SIZE * scale_y * (y + 0.5);
 
-	sprite.setPosition(symbol_pos_x , symbol_pos_y);
+	sprite.setPosition((float)symbol_pos_x , (float)symbol_pos_y);
 	screen.draw(sprite);
 	howManyEmpty_--;
 	return true;
@@ -399,12 +422,13 @@ bool TicTacToe::graphicComputerMove(sf::RenderWindow & screen)
 	unsigned int optimalXY[2] = { 0,0 };
 	int maximum = PLAYER_WIN_VALUE;
 	int tmp = 0;
-	if (howManyEmpty_ > 49) maxDepthLevel_ = 1;
-	if (howManyEmpty_ > 25 and howManyEmpty_ <= 49) maxDepthLevel_ = 2;
-	if (howManyEmpty_ > 14 and howManyEmpty_ <= 25) maxDepthLevel_ = 3;
-	if (howManyEmpty_ > 9 and howManyEmpty_ <= 14) maxDepthLevel_ = 4;
-	if (howManyEmpty_ > 5 and howManyEmpty_ <= 9) maxDepthLevel_ = 5;
-	if (howManyEmpty_ <= 5) maxDepthLevel_ = 8;
+	if (howManyEmpty_ > 64) maxDepthLevel_ = 2;
+	if (howManyEmpty_ > 36 and howManyEmpty_ <= 64) maxDepthLevel_ = 3;
+	if (howManyEmpty_ > 25 and howManyEmpty_ <= 36) maxDepthLevel_ = 4;
+	if (howManyEmpty_ > 9 and howManyEmpty_ <= 25) maxDepthLevel_ = 5;
+	if (howManyEmpty_ > 5 and howManyEmpty_ <= 9) maxDepthLevel_ = 10;
+	if (howManyEmpty_ <= 5) maxDepthLevel_ = 10;
+
 	for (unsigned int x = 0; x < currentBoard.getSize(); x++)
 	{
 		for (unsigned int y = 0; y < currentBoard.getSize(); y++)
@@ -416,7 +440,6 @@ bool TicTacToe::graphicComputerMove(sf::RenderWindow & screen)
 			newBoard.mark(computer_, x, y);
 
 			tmp = minmax_player(newBoard, 1, PLAYER_WIN_VALUE, COMPUTER_WIN_VALUE);
-			std::cout << tmp << std::endl;
 			if (tmp == COMPUTER_WIN_VALUE)
 			{
 				optimalXY[0] = x;
@@ -463,8 +486,8 @@ bool TicTacToe::graphicComputerMove(sf::RenderWindow & screen)
 	sf::Sprite sprite;
 	sprite.setTexture(texture);
 
-	float scale_x = (float)(SCREEN_X / (float)size_ / SYMBOL_SIZE) - 0.5f;
-	float scale_y = (float)(SCREEN_Y / (float)size_ / SYMBOL_SIZE) - 0.5f;
+	float scale_x = (float)(SCREEN_X / (float)size_ / SYMBOL_SIZE) - 0.3f;
+	float scale_y = (float)(SCREEN_Y / (float)size_ / SYMBOL_SIZE) - 0.3f;
 
 	float symbol_x = scale_x * SYMBOL_SIZE;
 	float symbol_y = scale_y * SYMBOL_SIZE;
@@ -478,10 +501,10 @@ bool TicTacToe::graphicComputerMove(sf::RenderWindow & screen)
 	scale_x = (float)SCREEN_X / size_ / FIELD_SIZE;
 	scale_y = (float)SCREEN_Y / size_ / FIELD_SIZE;
 
-	float symbol_pos_x = FIELD_SIZE * scale_x * (optimalXY[0] + 0.5);
-	float symbol_pos_y = FIELD_SIZE * scale_y * (optimalXY[1] + 0.5);
+	double symbol_pos_x = FIELD_SIZE * scale_x * (optimalXY[0] + 0.5);
+	double symbol_pos_y = FIELD_SIZE * scale_y * (optimalXY[1] + 0.5);
 
-	sprite.setPosition(symbol_pos_x, symbol_pos_y);
+	sprite.setPosition((float)symbol_pos_x, (float)symbol_pos_y);
 	screen.draw(sprite);
 	howManyEmpty_--;
 	return true;
@@ -494,7 +517,6 @@ int TicTacToe::h(Board board)
 	std::string pattern;
 
 	
-
 	pattern = tmp1;
 	pattern.front() = ' ';
 	pattern.back() = ' ';
@@ -523,76 +545,6 @@ int TicTacToe::h(Board board)
 	pattern.back() = ' ';
 	if (board.isPatternInRow(pattern)) return 8;
 
-
-	return 0;
-}
-
-int TicTacToe::h_player(Board board)
-{
-	std::string pattern(r_ + 1, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -10;
-	
-	pattern = std::string(r_ + 1, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 10;
-
-	pattern = std::string(r_, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -8;
-	
-	pattern = std::string(r_, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 8;
-
-	pattern = std::string(r_ -1, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -5;
-
-	pattern = std::string(r_ - 1, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 5;
-
-	return 0;
-}
-
-int TicTacToe::h_computer(Board board)
-{
-	std::string pattern(r_ + 1, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -10;
-
-	pattern = std::string(r_ + 1, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 10;
-	
-	pattern = std::string(r_, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -8;
-	
-	pattern = std::string(r_, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 8;
-
-	pattern = std::string(r_ - 1, (char)player_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return -5;
-
-	pattern = std::string(r_ - 1, (char)computer_);
-	pattern.front() = ' ';
-	pattern.back() = ' ';
-	if (board.isPatternInRow(pattern)) return 5;
 
 	return 0;
 }

@@ -6,7 +6,6 @@
 #include "Board.h"
 #include "TicTacToe.h"
 #include "Exeptions.h"
-#include <SFML\Graphics.hpp>
 
 
 int main()
@@ -37,7 +36,6 @@ int main()
 	} while (isExeption);
 
 
-
 	try 
 	{
 		game->play();
@@ -46,6 +44,7 @@ int main()
 	{
 		system("PAUSE");
 	}
+
 	system("PAUSE");
 	return 1;
 }
